@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link href="./bs3_7.css" rel="stylesheet" type="text/css" />
+    <link href="./centranet.css" rel="stylesheet" type="text/css" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+      }
+      .teal {
+        background: teal;
+        margin: 0;
+        padding: 0;
+      }
+
+      .teal p {
+        color: White;
+        text-align: center;
+        padding: 0.5rem;
+        margin: 0;
+      }
+      #app {
+        margin-left: 5rem;
+      }
+      table {
+        width: 80%;
+      }
+      .my-2 {
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .my-3 {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+      }
+      input {
+        width: 100%;
+      }
+
+      @-webkit-keyframes spinner-border {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes spinner-border {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .spinner-border {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        vertical-align: -0.125em;
+        border: 0.25em solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        -webkit-animation: 0.75s linear infinite spinner-border;
+        animation: 0.75s linear infinite spinner-border;
+      }
+      .spinner-border-sm {
+        width: 1rem;
+        height: 1rem;
+        border-width: 0.2em;
+      }
+    </style>
+    <title>Test page</title>
+  </head>
+  <body>
+    <div class="teal">
+      <p>Top</p>
+    </div>
+    <div class="container mt-4 px-0" id="app">
+      <div v-if="items.length" id="events_results">
+        <hr v-if="showHr()" />
+        <h2 class="fs-2">Results</h2>
+        <ul class="list-unstyled">
+          <li class="alternating" v-for="item in items">
+            <a :href="item.sys.uri">{{item.teamName}}</a>
+            <p class="mb-0"> <span v-html="boldSearchTerms(item.teamIntro)"></span>&nbsp;
+             <span>{{ item.bulletPoints[0] }}</span>.</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script>
+      const { createApp, toRaw } = Vue;
+      const app = createApp({
+        data() {
+          const contentType = 'centranetTeamPages';
+          const access = 'QCpZfwnsgnQsyHHB3ID5isS43cZnthj6YoSPtemxFGtcH15I';
+          return {
+            url: `https://cms-chesheast.cloud.contensis.com/api/delivery/projects/centranet/contentTypes/${contentType}/entries/?accessToken=${access}`,
+            items: [],
+            keywords: [],
+            queries: [],
+            regex: undefined,
+            dateOptions: {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            },
+            searchFields: ['teamName', 'teamIntro', 'teamEndParagraph'],
+          };
+        },
+        methods: {
+          showHr: function () {
+            let noResults = Array.from(
+              document.getElementsByClassName('sys_noresults')
+            );
+            if (noResults.length) {
+              document
+                .getElementById('SearchResults_wrapper')
+                .classList.add('d-none');
+              return false;
+            } else {
+              return true;
+            }
+          },
+          boldSearchTerms: function (item) {
+            return item.replaceAll(
+              this.regex,
+              `<strong>$&</strong>`
+            );
+          },
+          prep: function (str) {
+            return str ? str.replace(/\p{P}s/gu, 's').toLowerCase() : '';
+          },
+          searchByField: function (elem) {
+            return this.searchFields.some((f) => {
+              let temp = this.prep(elem[f]);
+              return this.keywords.every((e) => {
+                return temp.includes(e);
+              });
+            });
+          },
+          getEntries: function () {
+            fetch(this.url)
+              .then((response) => {
+                return response.json();
+              })
+              .then((data) => {
+                this.items = data.items.filter((e) => this.searchByField(e));
+                console.log(this.items[0]);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          },
+        },
+        mounted() {
+          const urlParams = new URLSearchParams(window.location.search);
+          let keywords = urlParams.get('search_keywords').trim();
+          if (keywords) {
+            let list = keywords.split(' ').reduce((acc, w) => {
+              return /[^\p{P}]s\b/.test(w)
+                ? [...acc, w, `${w.slice(0, -1)}'s`]
+                : [...acc, w];
+            }, []);
+            this.regex = new RegExp(`\\b${list.join('|')}\\b`, 'gi');
+            this.keywords = keywords.split(' ').map((e) => this.prep(e));
+            this.getEntries();
+          }
+        },
+      }).mount('#app');
+    </script>
+    <div class="teal">
+      <p>Bottom</p>
+    </div>
+    <script
+      type="text/javascript"
+      src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js?build=155126"
+    ></script>
+  </body>
+</html>
