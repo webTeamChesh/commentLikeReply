@@ -49,7 +49,6 @@ app.post('/*', (req, res) => {
       language: 'en-GB',
       dataFormat: 'entry',
     };
-
     client.entries
       .create(entry)
       .then((_) => {
