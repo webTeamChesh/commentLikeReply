@@ -1,0 +1,42 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Docker login
+      env:
+        USER: ${{ secrets.DOCKER_USER }}
+        PASS: ${{ secrets.DOCKER_PASS }}
+      run: |
+        docker login -u $USER -p $PASS
+    
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag cewebteam/comment-like:${{ github.run_number }}
+    - name: Docker push
+      run: docker push cewebteam/comment-like:${{ github.run_number }}
+  job2:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Sleep for 15 seconds
+      run: sleep 15s
+      shell: bash
+    - name: Contensis block push action
+      uses: contensis/block-push@v1
+      with:
+        block-id: comment-like
+        alias: chesheast
+        project-id: website
+        image-uri: cewebteam/comment-like:${{ github.run_number }}
+        client-id: ${{ secrets.CLIENT_ID }}
+        shared-secret: ${{ secrets.SHARED_SECRET }}
+        
+   
