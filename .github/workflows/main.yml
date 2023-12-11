@@ -38,5 +38,5 @@ jobs:
         image-uri: cewebteam/comment-like:${{ github.run_number }}
         client-id: ${{ secrets.CLIENT_ID }}
         shared-secret: ${{ secrets.SHARED_SECRET }}
-        
+        git-token: ${{ secrets.TOKEN }}
    
