@@ -34,7 +34,7 @@ const myLogger = function (req, _, next) {
 
 // Middleware
 app.use(express.json());
-app.use(express.static('public'));
+//app.use(express.static('public'));
 app.use(cors());
 app.use(myLogger);
 
