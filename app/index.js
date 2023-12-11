@@ -57,7 +57,7 @@ app.post('/*', (req, res) => {
         return res.end();
       })
       .catch((error) => {
-        console.log(error.data.data);
+        console.log(error.data);
         res.writeHead(301, { Location: '/' });
         return res.end();
       });
