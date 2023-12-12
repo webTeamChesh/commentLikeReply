@@ -1,6 +1,7 @@
 'use strict';
 import express from 'express';
 import cors from 'cors';
+
 import { v4 as uuidv4 } from 'uuid';
 import { NodejsClient } from 'contensis-management-api/lib/client/nodejs-client.js';
 
@@ -34,7 +35,7 @@ const myLogger = function (req, _, next) {
 
 // Middleware
 app.use(express.json());
-//app.use(express.static('public'));
+app.use(express.static('public'));
 app.use(cors());
 app.use(myLogger);
 
@@ -51,26 +52,24 @@ app.post('/*', (req, res) => {
     };
     client.entries
       .create(entry)
-      .then((_) => {
-        res.writeHead(301, { Location: '/' });
-        return res.end();
+      .then((result) => {
+        console.log(result);
+        return res.json(result);
       })
       .catch((error) => {
-        console.log(error.data);
-        res.writeHead(301, { Location: '/' });
-        return res.end();
+        console.log(error);
+        return res.json(error);
       });
   } else {
     client.entries
       .update(entry)
-      .then((_) => {
-        res.writeHead(301, { Location: '/' });
-        return res.end();
+      .then((result) => {
+        console.log(result);
+        return res.json(result);
       })
       .catch((error) => {
-        console.log(error);
-        res.writeHead(301, { Location: '/' });
-        return res.end();
+        console.log(error.data.data);
+        return res.json(error);
       });
   }
 });
