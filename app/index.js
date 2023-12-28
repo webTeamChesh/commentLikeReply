@@ -25,7 +25,6 @@ const client = NodejsClient.create({
   rootUrl: ROOT_URL,
 });
 
-console.log(client);
 
 // Start the server.
 const app = express();
