@@ -10,10 +10,9 @@ const ROOT_URL = `https://cms-${process.env.alias}.cloud.contensis.com/`;
 const PROJECT = process.env.projectId;
 //import {} from 'dotenv/config';
 
-console.log(process.env.CONTENSIS_CLIENT_ID);
-console.log(process.env.CONTENSIS_CLIENT_SECRET);
-console.log(PROJECT);
-console.log(ROOT_URL);
+Object.keys(process.env).forEach(k =>
+  console.log(`${k}: process.env[k]`);
+)
 
 const client = NodejsClient.create({
   clientType: 'client_credentials',
