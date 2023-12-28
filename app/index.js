@@ -42,6 +42,7 @@ app.use(myLogger);
 
 app.post('/*', (req, res) => {
   let entry = req.body;
+  console.log(entry);
   if (req.query.type === 'create') {
     entry.sys = {
       id: uuidv4(),
