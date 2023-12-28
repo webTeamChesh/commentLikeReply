@@ -10,6 +10,11 @@ const ROOT_URL = `https://cms-${process.env.alias}.cloud.contensis.com/`;
 const PROJECT = process.env.projectId;
 //import {} from 'dotenv/config';
 
+console.log(process.env.CONTENSIS_CLIENT_ID);
+console.log(process.env.CONTENSIS_CLIENT_SECRET);
+console.log(PROJECT);
+console.log(ROOT_URL);
+
 const client = NodejsClient.create({
   clientType: 'client_credentials',
   clientDetails: {
@@ -19,6 +24,8 @@ const client = NodejsClient.create({
   projectId: PROJECT,
   rootUrl: ROOT_URL,
 });
+
+console.log(client);
 
 // Start the server.
 const app = express();
@@ -42,7 +49,7 @@ app.use(myLogger);
 
 app.post('/*', (req, res) => {
   let entry = req.body;
-  console.log(entry);
+  //console.log(entry);
   if (req.query.type === 'create') {
     entry.sys = {
       id: uuidv4(),
@@ -68,6 +75,7 @@ app.post('/*', (req, res) => {
         return res.json(result);
       })
       .catch((error) => {
+        console.log(error);
         if (error.data.type === 'validation') {
           client.entries.get(entry.sys.id).then((result) => {
             return res.json({ statusText: 'retry', data: result });
