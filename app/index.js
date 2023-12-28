@@ -40,6 +40,7 @@ app.use(cors());
 app.use(myLogger);
 
 // Routes
+
 app.post('/*', (req, res) => {
   let entry = req.body;
   if (req.query.type === 'create') {
@@ -64,12 +65,16 @@ app.post('/*', (req, res) => {
     client.entries
       .update(entry)
       .then((result) => {
-        console.log(result);
         return res.json(result);
       })
       .catch((error) => {
-        console.log(error.data.data);
-        return res.json(error);
+        if (error.data.type === 'validation') {
+          client.entries.get(entry.sys.id).then((result) => {
+            return res.json({ statusText: 'retry', data: result });
+          });
+        } else {
+          return res.json(error);
+        }
       });
   }
 });
